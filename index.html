@@ -95,7 +95,8 @@
     <button id="join-room">Join Room</button>
   </div>
 
-  <div id="chat-box" style="display: none;"></div>
+  <div id="chat-box" style="display: block; height: 300px; overflow-y: scroll; border: 1px solid #ccc;"></div>
+
   <form id="chat-form" style="display: none;">
     <input type="text" id="message" placeholder="Type your message" required>
     <button type="submit">Send</button>
@@ -167,10 +168,10 @@
       database.ref("rooms/" + currentRoom + "/messages").push({
         content: message,
         sender: username,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
+        timestamp: Date.now()  // Optional: Add a timestamp
       });
 
-      // Save message locally
+      // Save the message to localStorage
       saveMessageLocally({ content: message, sender: username });
 
       // Clear the input field
@@ -188,12 +189,17 @@
       // Listen for new messages in Firebase
       database.ref("rooms/" + currentRoom + "/messages").on("child_added", function (snapshot) {
         const messageData = snapshot.val();
+        console.log("New message detected from Firebase: ", messageData);  // Debugging
+
         displayMessage(messageData.content, messageData.sender);
 
-        // Save to localStorage
-        saveMessageLocally(messageData);
+
       });
     }
+
+
+
+
 
     // Function to display message
     function displayMessage(content, sender) {
@@ -203,15 +209,16 @@
 
       // Style messages based on sender
       if (sender === username) {
-        messageDiv.classList.add("user");
+        messageDiv.classList.add("user");  // Styling for your messages
       } else {
-        messageDiv.classList.add("other");
+        messageDiv.classList.add("other");  // Styling for others' messages
       }
 
-      messageDiv.textContent = `${sender}: ${content}`;
+      messageDiv.textContent = `${sender}: ${content}`;  // Display sender's name and message
       chatBox.appendChild(messageDiv);
-      chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+      chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the bottom
     }
+
 
     // Save messages to localStorage
     function saveMessageLocally(message) {
@@ -227,6 +234,7 @@
         displayMessage(msg.content, msg.sender);
       });
     }
+
   </script>
 </body>
 
